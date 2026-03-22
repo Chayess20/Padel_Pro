@@ -16,7 +16,7 @@
 <body class="@yield('body-class')">
     <header class="header">
         <a href="{{ url('/') }}" class="logo">
-            <img src="{{ asset('images/logo.png') }}" alt="Y-PADEL Logo" class="main-logo">
+            <img src="{{ asset('images/logo.png') }}" alt="PADEL ACE Logo" class="main-logo">
         </a>
         <nav class="nav">
             <a href="{{ url('/') }}" class="{{ Request::is('/') ? 'active' : '' }}">Home</a>
@@ -49,7 +49,7 @@
     <footer class="footer">
         <div class="footer-container">
             <div class="footer-col branding">
-                <img src="{{ asset('images/logo.png') }}" alt="Y-PADEL Logo" class="footer-logo">
+                <img src="{{ asset('images/logo.png') }}" alt="PADEL ACE Logo" class="footer-logo">
                 <p class="footer-text">
                     The premier padel circuit in Dusseldorf. Join the community, 
                     track your ranking, and dominate the court.
@@ -94,7 +94,7 @@
     {{-- GDPR cookie consent banner --}}
     <div id="cookie-banner" style="display:none; position:fixed; bottom:0; left:0; right:0; z-index:9999;
          background:var(--navy); color:var(--white); padding:1rem 1.5rem;
-         display:flex; flex-wrap:wrap; align-items:center; gap:1rem;
+         flex-wrap:wrap; align-items:center; gap:1rem;
          border-top:2px solid var(--neon-yellow); font-size:0.875rem;">
         <p style="margin:0; flex:1; min-width:200px;">
             We use a strictly necessary session cookie to keep you logged in.

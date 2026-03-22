@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Y-Padel Tournaments — PADEL ACE')
+@section('title', 'Tournaments — PADEL ACE')
 @section('body-class', 'tournament-hub')
 
 @section('content')
 <div class="page-layout-wrapper">
     <div class="tournament-hero">
-        <h1 class="section-title">Y-PADEL CIRCUIT</h1>
+        <h1 class="section-title">PADEL ACE CIRCUIT</h1>
         <p class="hero-subtitle">Official Deutschland Padel Tour (DPT) — Monthly Events</p>
     </div>
 
