@@ -70,6 +70,24 @@ document.querySelectorAll('.modal-close').forEach((btn) => {
 // -----------------------------------------------
 // Navigation: show/hide Sign Up based on session
 // -----------------------------------------------
+
+// Mobile hamburger menu toggle
+const menuToggle = document.querySelector('.menu-toggle');
+const mainNav    = document.querySelector('.nav');
+if (menuToggle && mainNav) {
+    menuToggle.addEventListener('click', () => {
+        mainNav.classList.toggle('open');
+        menuToggle.classList.toggle('active');
+    });
+    // Close when a nav link is clicked
+    mainNav.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => {
+            mainNav.classList.remove('open');
+            menuToggle.classList.remove('active');
+        });
+    });
+}
+
 async function updateNav() {
     try {
         const res = await apiFetch('session');
@@ -897,10 +915,16 @@ const resetForm = document.getElementById('reset-password-form');
 if (resetForm) {
     const msgEl = document.getElementById('reset-msg');
 
-    // Pull token from URL query string and inject into hidden field
-    const urlToken = new URLSearchParams(window.location.search).get('token') || '';
+    // Pull token and email from URL query string and inject into hidden fields
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlToken  = urlParams.get('token') || '';
+    const urlEmail  = urlParams.get('email') || '';
+
     const tokenInput = document.getElementById('reset-token');
     if (tokenInput) tokenInput.value = urlToken;
+
+    const emailInput = document.getElementById('reset-email');
+    if (emailInput) emailInput.value = urlEmail;
 
     if (!urlToken) {
         if (msgEl) {
@@ -908,7 +932,8 @@ if (resetForm) {
             msgEl.style.color   = '#e74c3c';
             msgEl.style.display = 'block';
         }
-        resetForm.querySelector('button[type="submit"]').disabled = true;
+        const submitBtn = resetForm.querySelector('button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
     }
 
     resetForm.addEventListener('submit', async (e) => {
@@ -929,7 +954,7 @@ if (resetForm) {
 
         const res = await apiFetch('reset-password', {
             method: 'POST',
-            body: JSON.stringify({ token: urlToken, password: newPassword }),
+            body: JSON.stringify({ token: urlToken, email: urlEmail, password: newPassword }),
         });
 
         if (msgEl) {

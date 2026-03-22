@@ -31,6 +31,9 @@
             Don't have an account?
             <a href="{{ route('register') }}" style="color:var(--navy); font-weight:700; text-decoration:underline;">Sign Up</a>
         </p>
+        <p style="margin-top:0.5rem; font-size:0.88rem; text-align:center; color:var(--text-gray);">
+            <a href="{{ route('password.request') }}" style="color:var(--navy); text-decoration:underline;">Forgot your password?</a>
+        </p>
     </div>
 </section>
 @endsection

@@ -27,7 +27,7 @@ class ProfileController extends Controller
         $recentTournaments = $registrations->take(5)->map(function ($reg) {
             $t = $reg->tournament;
             return [
-                'title'    => $t->name ?? 'Tournament',
+                'title'    => $t->title ?? 'Tournament',
                 'division' => $t->division ?? '',
                 'category' => $t->category ?? '',
             ];
@@ -43,7 +43,7 @@ class ProfileController extends Controller
                 $t = $reg->tournament;
                 return [
                     'id'         => $reg->id,
-                    'title'      => $t->name ?? 'Tournament',
+                    'title'      => $t->title ?? 'Tournament',
                     'division'   => $t->division ?? '',
                     'event_date' => $t->event_date ?? null,
                     'entry_fee'  => $t->entry_fee ?? 0,
@@ -72,6 +72,31 @@ class ProfileController extends Controller
                 'upcoming_tournaments'=> $upcomingTournaments,
             ],
         ]);
+    }
+
+    /**
+     * Cancel an upcoming tournament registration.
+     */
+    public function cancelBooking(Request $request): JsonResponse
+    {
+        $request->validate(['booking_id' => ['required', 'integer']]);
+
+        $registration = TournamentRegistration::where('id', $request->booking_id)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (! $registration) {
+            return response()->json(['success' => false, 'message' => 'Booking not found.'], 404);
+        }
+
+        $tournament = $registration->tournament;
+        if ($tournament && $tournament->event_date && $tournament->event_date < now()->toDateString()) {
+            return response()->json(['success' => false, 'message' => 'Cannot cancel a past tournament.'], 422);
+        }
+
+        $registration->delete();
+
+        return response()->json(['success' => true, 'message' => 'Booking cancelled successfully.']);
     }
 
     /**

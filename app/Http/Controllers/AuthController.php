@@ -7,7 +7,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\Rules\Password as PasswordRule;
 
 class AuthController extends Controller
 {
@@ -22,7 +23,7 @@ class AuthController extends Controller
             'phone'            => ['nullable', 'string', 'max:30'],
             'gender'           => ['nullable', 'in:male,female'],
             'national_ranking' => ['nullable', 'boolean'],
-            'password'         => ['required', Password::min(8)],
+            'password'         => ['required', PasswordRule::min(8)],
         ]);
 
         $user = User::create([
@@ -110,5 +111,53 @@ class AuthController extends Controller
                 'email'      => $user->email,
             ],
         ]);
+    }
+
+    /**
+     * Send a password reset link to the given email address.
+     */
+    public function forgotPassword(Request $request): JsonResponse
+    {
+        $request->validate(['email' => ['required', 'email']]);
+
+        Password::sendResetLink($request->only('email'));
+
+        // Always return success to avoid leaking whether an email is registered
+        return response()->json([
+            'success' => true,
+            'message' => 'If an account with that email exists, a reset link has been sent.',
+        ]);
+    }
+
+    /**
+     * Reset the user's password using the token from the reset email.
+     */
+    public function resetPassword(Request $request): JsonResponse
+    {
+        $request->validate([
+            'token'    => ['required', 'string'],
+            'email'    => ['required', 'email'],
+            'password' => ['required', PasswordRule::min(8)],
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'token'),
+            function (User $user, string $password) {
+                $user->password = Hash::make($password);
+                $user->save();
+            }
+        );
+
+        if ($status === Password::PASSWORD_RESET) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Password reset successfully! You can now log in.',
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid or expired reset link. Please request a new one.',
+        ], 422);
     }
 }
