@@ -9,7 +9,8 @@
 
         <div class="ranking-nav-container">
             <div class="toggle-pill">
-                <button class="rank-tab-btn active" data-target="mixed-levels">Mixed Levels (Professional-Beginner)</button>
+                <button class="rank-tab-btn active" data-target="mixed-levels">Points System</button>
+                <button class="rank-tab-btn" data-target="men-division">Men Division</button>
                 <button class="rank-tab-btn" data-target="women-division">Women Division</button>
             </div>
         </div>
@@ -34,7 +35,34 @@
             </div>
         </div>
 
-        {{-- Women Division (dynamically loaded from DB) --}}
+        {{-- Men Division (live from DB) --}}
+        <div id="men-division" class="rank-tab-content">
+            <div class="ranking-table-container">
+                <table class="ranking-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th><th>Player Name</th><th>Division</th>
+                            <th>Total Points</th><th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($menPlayers as $index => $player)
+                        <tr>
+                            <td>#{{ $index + 1 }}</td>
+                            <td>{{ $player->name }}</td>
+                            <td>{{ $player->division }}</td>
+                            <td>{{ $player->points }}P</td>
+                            <td>{{ $player->points >= 1000 ? 'Pro Active' : 'Active' }}</td>
+                        </tr>
+                        @empty
+                        <tr><td colspan="5" style="text-align:center; color:#999; padding:2rem;">No players found.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- Women Division (live from DB) --}}
         <div id="women-division" class="rank-tab-content">
             <div class="ranking-table-container">
                 <table class="ranking-table">
@@ -45,7 +73,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($womenPlayers as $index => $player)
+                        @forelse($womenPlayers as $index => $player)
                         <tr>
                             <td>#{{ $index + 1 }}</td>
                             <td>{{ $player->name }}</td>
@@ -53,7 +81,9 @@
                             <td>{{ $player->points }}P</td>
                             <td>{{ $player->points >= 1000 ? 'Pro Active' : 'Active' }}</td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr><td colspan="5" style="text-align:center; color:#999; padding:2rem;">No players found.</td></tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

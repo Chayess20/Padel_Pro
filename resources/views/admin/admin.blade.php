@@ -134,8 +134,14 @@
                 <div style="background:var(--white); border-radius:12px; padding:1.5rem; box-shadow:0 2px 8px rgba(0,0,0,0.06); max-width:600px;">
                     <form class="score-entry-form admin-form">
                         @csrf
-                        <label style="display:block; font-weight:600; margin-bottom:0.5rem;">Player ID</label>
-                        <input type="number" name="player_id" placeholder="Enter player ID" required>
+                        <label style="display:block; font-weight:600; margin-bottom:0.5rem;">Player</label>
+                        <input type="text" id="rank-player-search" placeholder="Search by name or email…" autocomplete="off">
+                        <div id="rank-player-suggestions"
+                             style="display:none; background:var(--white); border:1px solid #E2E8F0; border-radius:6px;
+                                    max-height:180px; overflow-y:auto; margin-top:-0.8rem; margin-bottom:1rem;
+                                    box-shadow:0 4px 12px rgba(0,0,0,0.08); z-index:10; position:relative;"></div>
+                        <input type="hidden" name="player_id" id="rank-player-id">
+                        <p id="rank-player-label" style="font-size:0.85rem; color:var(--text-gray); margin-top:-0.5rem; margin-bottom:1rem;"></p>
 
                         <label style="display:block; font-weight:600; margin-bottom:0.5rem;">Points</label>
                         <input type="number" name="points" placeholder="Number of points" min="1" required>
@@ -226,6 +232,36 @@
             <button class="modal-close btn" style="border:1px solid #CBD5E0; background:transparent; color:var(--text-gray);">Cancel</button>
             <button id="confirm-delete-btn" class="btn btn-primary" style="background:#e63946;">Delete</button>
         </div>
+    </div>
+</div>
+
+{{-- ===================== EDIT PLAYER MODAL ===================== --}}
+<div id="edit-player-modal" class="modal">
+    <div class="modal-content" style="max-width:440px;">
+        <button class="modal-close" aria-label="Close">&times;</button>
+        <h3 style="font-family:var(--font-heading); font-size:1.3rem; margin-bottom:0.5rem;">Edit Player</h3>
+        <p id="edit-player-info" style="color:var(--text-gray); font-size:0.9rem; margin-bottom:1.5rem;"></p>
+        <p id="edit-player-msg" style="display:none; margin-bottom:1rem; font-weight:500;"></p>
+        <form id="edit-player-form" class="admin-form">
+            <input type="hidden" id="edit-player-id" name="user_id">
+            <label style="display:block; font-weight:600; margin-bottom:0.5rem;">Points Adjustment</label>
+            <input type="number" id="edit-player-points" name="points" placeholder="Number of points" min="1" required>
+
+            <label style="display:block; font-weight:600; margin-bottom:0.75rem;">Type</label>
+            <div style="display:flex; gap:2rem; margin-bottom:1rem;">
+                <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
+                    <input type="radio" name="type" value="addition" checked> Add Points
+                </label>
+                <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
+                    <input type="radio" name="type" value="deduction"> Deduct Points
+                </label>
+            </div>
+
+            <label style="display:block; font-weight:600; margin-bottom:0.5rem;">Reason <span style="font-weight:400; color:var(--text-gray);">(optional)</span></label>
+            <input type="text" name="reason" placeholder="e.g. Tournament win, Manual correction">
+
+            <button type="submit" class="btn btn-primary" style="width:100%; margin-top:0.5rem;">Apply Adjustment</button>
+        </form>
     </div>
 </div>
 

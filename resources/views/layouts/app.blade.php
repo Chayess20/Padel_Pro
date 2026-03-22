@@ -10,9 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}?v={{ time() }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     @stack('styles')
 </head>
-<body>
+<body class="@yield('body-class')">
     <header class="header">
         <a href="{{ url('/') }}" class="logo">
             <img src="{{ asset('images/logo.png') }}" alt="Y-PADEL Logo" class="main-logo">

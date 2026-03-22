@@ -11,7 +11,7 @@
 const API = '/api';
 
 /** CSRF token received from the server after login/register/session check */
-let _csrfToken = '';
+let _csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
 function setCsrfToken(token) {
     if (token) _csrfToken = token;
@@ -396,10 +396,18 @@ if (tournamentGrid) {
     async function loadTournaments() {
         let url = 'tournaments?type=monthly';
         if (currentDivisionFilter !== 'all') url += '&division=' + encodeURIComponent(currentDivisionFilter);
+        tournamentGrid.innerHTML = '<div class="grid-loading">Loading tournaments…</div>';
         const res = await apiFetch(url);
-        if (!res.success) return;
+        if (!res.success) {
+            tournamentGrid.innerHTML = '<div class="grid-loading">Failed to load tournaments.</div>';
+            return;
+        }
 
         tournamentGrid.innerHTML = '';
+        if (!res.data.length) {
+            tournamentGrid.innerHTML = '<div class="grid-loading">No tournaments found.</div>';
+            return;
+        }
         res.data.forEach((t) => {
             const isFull = t.registered_count >= t.max_players;
             const card = document.createElement('div');
@@ -488,10 +496,18 @@ if (weeklyGrid) {
     async function loadWeeklyTournaments(division = '') {
         let url = 'tournaments?type=weekly';
         if (division) url += '&division=' + encodeURIComponent(division);
+        weeklyGrid.innerHTML = '<div class="grid-loading">Loading tournaments…</div>';
         const res = await apiFetch(url);
-        if (!res.success) return;
+        if (!res.success) {
+            weeklyGrid.innerHTML = '<div class="grid-loading">Failed to load tournaments.</div>';
+            return;
+        }
 
         weeklyGrid.innerHTML = '';
+        if (!res.data.length) {
+            weeklyGrid.innerHTML = '<div class="grid-loading">No tournaments available.</div>';
+            return;
+        }
         res.data.forEach((t) => {
             const isFull = t.registered_count >= t.max_players;
             const card = document.createElement('div');
@@ -750,8 +766,62 @@ if (document.querySelector('.admin-page')) {
                     <td>${escHtml(p.email)}</td>
                     <td>${escHtml(p.division)}</td>
                     <td>${p.points.toLocaleString()}</td>
-                    <td><button class="btn-icon" data-player-id="${p.id}" data-player-name="${escHtml(p.full_name)}">Edit</button></td>
+                    <td><button class="btn-icon edit-player-btn"
+                            data-player-id="${p.id}"
+                            data-player-name="${escHtml(p.full_name)}"
+                            data-player-division="${escHtml(p.division)}"
+                            data-player-points="${p.points}">✎ Edit</button></td>
                 </tr>`).join('');
+
+            // Wire Edit Player buttons
+            tbody.querySelectorAll('.edit-player-btn').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const id   = btn.dataset.playerId;
+                    const name = btn.dataset.playerName;
+                    const div  = btn.dataset.playerDivision;
+                    const pts  = btn.dataset.playerPoints;
+
+                    document.getElementById('edit-player-id').value = id;
+                    document.getElementById('edit-player-points').value = '';
+                    document.querySelector('#edit-player-form [name="type"][value="addition"]').checked = true;
+                    document.querySelector('#edit-player-form [name="reason"]').value = '';
+                    const infoEl = document.getElementById('edit-player-info');
+                    if (infoEl) infoEl.textContent = `${name} · ${div} · ${parseInt(pts).toLocaleString()}P`;
+                    const msgEl = document.getElementById('edit-player-msg');
+                    if (msgEl) msgEl.style.display = 'none';
+                    openModal('edit-player-modal');
+                });
+            });
+        }
+
+        // Edit Player form submit
+        const editPlayerForm = document.getElementById('edit-player-form');
+        if (editPlayerForm) {
+            editPlayerForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const msgEl = document.getElementById('edit-player-msg');
+                if (msgEl) msgEl.style.display = 'none';
+
+                const payload = {
+                    user_id: editPlayerForm.querySelector('[name="user_id"]')?.value,
+                    points:  editPlayerForm.querySelector('[name="points"]')?.value,
+                    type:    editPlayerForm.querySelector('input[name="type"]:checked')?.value || 'addition',
+                    reason:  editPlayerForm.querySelector('[name="reason"]')?.value,
+                };
+                const res = await apiFetch('admin/adjust-ranking', {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                });
+                if (msgEl) {
+                    msgEl.textContent   = res.message || (res.success ? 'Updated!' : 'Error.');
+                    msgEl.style.color   = res.success ? '#2ecc71' : '#e74c3c';
+                    msgEl.style.display = 'block';
+                }
+                if (res.success) {
+                    setTimeout(() => closeModal('edit-player-modal'), 1500);
+                    loadPlayers(document.querySelector('.admin-search-bar')?.value || '');
+                }
+            });
         }
 
         // Admin sidebar navigation
@@ -843,13 +913,79 @@ if (document.querySelector('.admin-page')) {
             });
         }
 
-        // Adjust rankings form
+        // Adjust rankings form — with player name autocomplete
         const rankForm = document.querySelector('#rankings .score-entry-form');
         if (rankForm) {
+            const playerSearchInput  = document.getElementById('rank-player-search');
+            const playerSuggestions  = document.getElementById('rank-player-suggestions');
+            const playerIdHidden     = document.getElementById('rank-player-id');
+            const playerLabel        = document.getElementById('rank-player-label');
+
+            let _rankPlayers = [];
+
+            // Fetch all players once when the Rankings tab is opened
+            async function fetchRankPlayers() {
+                if (_rankPlayers.length) return;
+                const r = await apiFetch('admin/players');
+                if (r.success) _rankPlayers = r.data;
+            }
+
+            if (playerSearchInput) {
+                playerSearchInput.addEventListener('focus', fetchRankPlayers);
+
+                playerSearchInput.addEventListener('input', () => {
+                    const q = playerSearchInput.value.trim().toLowerCase();
+                    if (!q || !_rankPlayers.length) {
+                        if (playerSuggestions) playerSuggestions.style.display = 'none';
+                        return;
+                    }
+                    const matches = _rankPlayers.filter(
+                        (p) => p.full_name.toLowerCase().includes(q) || p.email.toLowerCase().includes(q)
+                    ).slice(0, 8);
+
+                    if (!matches.length) {
+                        if (playerSuggestions) playerSuggestions.style.display = 'none';
+                        return;
+                    }
+
+                    if (playerSuggestions) {
+                        playerSuggestions.innerHTML = matches.map((p) => `
+                            <div class="rank-suggestion-item" data-id="${p.id}"
+                                 data-name="${escHtml(p.full_name)}" data-div="${escHtml(p.division)}" data-pts="${p.points}"
+                                 style="padding:0.6rem 1rem; cursor:pointer; border-bottom:1px solid #F1F5F9; font-size:0.9rem;">
+                                <strong>${escHtml(p.full_name)}</strong>
+                                <span style="color:var(--text-gray); font-size:0.8rem; margin-left:0.5rem;">${escHtml(p.division)} · ${p.points}P</span>
+                            </div>`).join('');
+                        playerSuggestions.style.display = 'block';
+
+                        playerSuggestions.querySelectorAll('.rank-suggestion-item').forEach((item) => {
+                            item.addEventListener('mousedown', (ev) => {
+                                ev.preventDefault();
+                                playerSearchInput.value = item.dataset.name;
+                                if (playerIdHidden) playerIdHidden.value = item.dataset.id;
+                                if (playerLabel) playerLabel.textContent = `${item.dataset.name} · ${item.dataset.div} · ${parseInt(item.dataset.pts).toLocaleString()}P`;
+                                playerSuggestions.style.display = 'none';
+                            });
+                        });
+                    }
+                });
+
+                playerSearchInput.addEventListener('blur', () => {
+                    setTimeout(() => {
+                        if (playerSuggestions) playerSuggestions.style.display = 'none';
+                    }, 150);
+                });
+            }
+
             rankForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                const uid = playerIdHidden?.value;
+                if (!uid) {
+                    showStatusModal(false, 'Please select a player from the list.');
+                    return;
+                }
                 const payload = {
-                    user_id: rankForm.querySelector('[name="player_id"]')?.value,
+                    user_id: uid,
                     points:  rankForm.querySelector('[name="points"]')?.value,
                     type:    rankForm.querySelector('input[name="adj"]:checked')?.value || 'addition',
                     reason:  rankForm.querySelector('[name="reason"]')?.value,
@@ -859,8 +995,26 @@ if (document.querySelector('.admin-page')) {
                     body: JSON.stringify(payload),
                 });
                 showStatusModal(res.success, res.message);
+                if (res.success) {
+                    rankForm.reset();
+                    if (playerLabel) playerLabel.textContent = '';
+                    if (playerIdHidden) playerIdHidden.value = '';
+                }
             });
         }
+
+        // Wire Rankings tab to pre-fetch player list
+        document.querySelectorAll('.admin-link').forEach((link) => {
+            link.addEventListener('click', () => {
+                if (link.getAttribute('href') === '#rankings') {
+                    const r = document.querySelector('#rankings .score-entry-form');
+                    if (r) {
+                        const inp = document.getElementById('rank-player-search');
+                        if (inp) inp.dispatchEvent(new Event('focus'));
+                    }
+                }
+            });
+        });
 
         // Logout
         const logoutLink = document.getElementById('admin-logout-btn')

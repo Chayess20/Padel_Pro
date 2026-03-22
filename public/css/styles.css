@@ -982,6 +982,39 @@ img {
 }
 
 
+/* History items in profile (recent activity + upcoming bookings) */
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #EDF2F7;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.history-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.history-info strong {
+    font-size: 0.95rem;
+    color: var(--navy);
+}
+
+.history-info span {
+    font-size: 0.8rem;
+    color: var(--text-gray);
+}
+
+/* ------------------------------------------------------------------ */
+
 /* --- SECTION 11: AUTHENTICATION (LOGIN & SIGNUP) --- */
 .auth-page {
     background: var(--navy);
@@ -1045,6 +1078,118 @@ img {
 
 
 /* --- SECTION 12: WEEKLY TOURNAMENT SERIES --- */
+
+/* Weekly page wrapper: matches .page-layout-wrapper style */
+.weekly-main-wrapper {
+    padding-top: 100px;
+    min-height: 100vh;
+    background-color: var(--off-white);
+}
+
+.weekly-header-box {
+    background: var(--navy);
+    padding: 2.5rem 5%;
+    border-bottom: 4px solid var(--neon-yellow);
+    text-align: center;
+}
+
+.weekly-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    color: var(--white);
+    letter-spacing: 2px;
+    margin: 0;
+}
+
+.weekly-layout-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 3%;
+}
+
+@media (min-width: 992px) {
+    .weekly-layout-container {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+}
+
+.weekly-sidebar {
+    width: 100%;
+    background-color: var(--white);
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+@media (min-width: 992px) {
+    .weekly-sidebar {
+        width: 240px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 100px;
+    }
+}
+
+.weekly-content {
+    flex-grow: 1;
+    width: 100%;
+}
+
+/* Radio-label filter (used in weekly sidebar) */
+.filter-radios {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-gray);
+    cursor: pointer;
+}
+
+.radio-label input[type="radio"] {
+    accent-color: var(--navy);
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+/* Loading state for grids */
+.grid-loading {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-gray);
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.grid-loading::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border: 3px solid #E2E8F0;
+    border-top-color: var(--navy);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
 .weekly-hero {
     background: var(--white);
     padding: 3rem 5%;
