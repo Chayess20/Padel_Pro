@@ -3,6 +3,7 @@
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RankingController;
 use App\Http\Controllers\TournamentController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // 1. Home
@@ -60,3 +61,12 @@ Route::middleware('auth')->group(function () {
 Route::get('/admin', function () {
     return view('admin.admin');
 })->middleware(['auth', 'admin'])->name('admin.dashboard');
+
+// 9. Legal pages
+Route::get('/terms', function () {
+    return view('legal.terms');
+})->name('legal.terms');
+
+Route::get('/privacy', function () {
+    return view('legal.privacy');
+})->name('legal.privacy');

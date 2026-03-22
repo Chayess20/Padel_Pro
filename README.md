@@ -1,59 +1,80 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# PADEL ACE
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel-based padel tournament management and rankings platform for the Düsseldorf padel community.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Tournament management** — Monthly (DPT) and Weekly tournament series with division-based categories
+- **Player rankings** — Point-based ranking system with automatic division promotion (Beginner → Intermediate → Advanced → Professional)
+- **Player accounts** — Registration, login, profile management, and booking history
+- **Admin panel** — Create/update/delete tournaments, manage player rankings, paginated player list
+- **Password reset** — Email-based password reset flow
+- **Security** — CSRF protection, rate limiting on auth endpoints, session-based authentication
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Backend:** PHP 8.2, Laravel 12, Eloquent ORM
+- **Frontend:** Vanilla JS, Blade templates, custom CSS
+- **Database:** MySQL (production) / SQLite (testing)
+- **Admin UI:** Filament 3 (available at `/filament`)
 
-## Learning Laravel
+## Requirements
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- PHP >= 8.2 with PDO, mbstring, openssl extensions
+- Composer
+- Node.js & npm
+- MySQL database
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Setup
 
-## Laravel Sponsors
+```bash
+# 1. Install PHP dependencies
+composer install
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# 2. Copy and configure environment
+cp .env.example .env
+# Edit .env — set APP_URL, DB_*, MAIL_* values
 
-### Premium Partners
+# 3. Generate application key
+php artisan key:generate
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# 4. Run database migrations
+php artisan migrate
 
-## Contributing
+# 5. Install and build frontend assets
+npm install && npm run build
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# 6. Start the development server
+php artisan serve
+```
 
-## Code of Conduct
+> **Production checklist** — before going live:
+> - Set `APP_ENV=production` and `APP_DEBUG=false` in `.env`
+> - Set `APP_URL` to your real `https://` domain
+> - Set `SESSION_SECURE_COOKIE=true`
+> - Configure a real mail provider (`MAIL_MAILER`, `MAIL_HOST`, etc.)
+> - Run `php artisan config:cache && php artisan route:cache`
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Running Tests
 
-## Security Vulnerabilities
+```bash
+composer test
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Project Structure
+
+```
+app/
+  Http/Controllers/   — AuthController, TournamentController, ProfileController, AdminController, RankingController
+  Models/             — User, Tournament, TournamentRegistration, RankingAdjustment
+  Http/Middleware/    — EnsureAdmin
+resources/views/      — Blade templates (layouts, auth, tournaments, rankings, profile, admin, legal)
+routes/
+  web.php             — Browser routes
+  api.php             — JSON API routes (session-authenticated)
+database/migrations/  — All schema migrations
+```
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+MIT

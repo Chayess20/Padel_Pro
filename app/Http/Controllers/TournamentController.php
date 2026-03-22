@@ -85,6 +85,10 @@ class TournamentController extends Controller
 
         $tournament = Tournament::findOrFail($request->tournament_id);
 
+        if ($tournament->status !== 'open') {
+            return response()->json(['success' => false, 'message' => 'This tournament is not open for registration.'], 422);
+        }
+
         $exists = TournamentRegistration::where('user_id', Auth::id())
             ->where('tournament_id', $tournament->id)
             ->exists();

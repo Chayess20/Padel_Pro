@@ -33,8 +33,9 @@ class AuthController extends Controller
             'gender'           => $validated['gender'] ?? null,
             'national_ranking' => filter_var($validated['national_ranking'] ?? false, FILTER_VALIDATE_BOOLEAN),
             'password'         => Hash::make($validated['password']),
-            'role'             => 'player',
         ]);
+        $user->role = 'player';
+        $user->save();
 
         Auth::login($user);
         $request->session()->regenerate();

@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'PADEL ACE — Book Courts & Join Tournaments')
+@section('title', 'PADEL ACE — Join Tournaments & Track Rankings')
 
 @section('content')
 <section id="home" class="hero">
     <div class="hero-content">
-        <p class="hero-tag">Court Booking & Tournaments</p>
+        <p class="hero-tag">Tournaments & Rankings</p>
         <h1>Smash your <em>best game</em> on the padel court</h1>
         <p class="hero-desc">Compete in our Weekly and Monthly tournament series to claim your spot on the official rankings.</p>
         <div class="hero-cta">

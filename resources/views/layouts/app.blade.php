@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'PADEL ACE — Book Courts & Join Tournaments')</title>
+    <title>@yield('title', 'PADEL ACE — Tournaments & Rankings')</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -70,9 +70,9 @@
             <div class="footer-col">
                 <h4 class="col-title">Support</h4>
                 <ul class="footer-links">
-                    <li><a href="#">Terms of Service</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="{{ route('legal.terms') }}">Terms of Service</a></li>
+                    <li><a href="{{ route('legal.privacy') }}">Privacy Policy</a></li>
+                    <li><a href="mailto:contact@padel-ace.com">Contact Us</a></li>
                 </ul>
             </div>
 
@@ -90,5 +90,33 @@
 
     <script src="{{ asset('js/script.js') }}"></script>
     @stack('scripts')
+
+    {{-- GDPR cookie consent banner --}}
+    <div id="cookie-banner" style="display:none; position:fixed; bottom:0; left:0; right:0; z-index:9999;
+         background:var(--navy); color:var(--white); padding:1rem 1.5rem;
+         display:flex; flex-wrap:wrap; align-items:center; gap:1rem;
+         border-top:2px solid var(--neon-yellow); font-size:0.875rem;">
+        <p style="margin:0; flex:1; min-width:200px;">
+            We use a strictly necessary session cookie to keep you logged in.
+            No tracking cookies are used.
+            See our <a href="{{ route('legal.privacy') }}" style="color:var(--neon-yellow); text-decoration:underline;">Privacy Policy</a> for details.
+        </p>
+        <button id="cookie-accept" style="background:var(--neon-yellow); color:var(--navy); border:none;
+                padding:0.5rem 1.25rem; border-radius:4px; font-weight:700; cursor:pointer; white-space:nowrap;">
+            Got it
+        </button>
+    </div>
+    <script>
+        (function () {
+            var banner = document.getElementById('cookie-banner');
+            if (!localStorage.getItem('cookie_consent')) {
+                banner.style.display = 'flex';
+            }
+            document.getElementById('cookie-accept').addEventListener('click', function () {
+                localStorage.setItem('cookie_consent', '1');
+                banner.style.display = 'none';
+            });
+        })();
+    </script>
 </body>
 </html>
