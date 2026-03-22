@@ -79,7 +79,10 @@
                 <h4 class="col-title">Connect</h4>
                 <p>Follow us on Social Media</p>
                 <div class="social-icons">
-                    </div>
+                    <a href="#" class="social-box" aria-label="Instagram">IG</a>
+                    <a href="#" class="social-box" aria-label="WhatsApp">WA</a>
+                    <a href="#" class="social-box" aria-label="Facebook">FB</a>
+                </div>
             </div>
         </div>
     </footer>
