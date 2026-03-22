@@ -29,7 +29,7 @@ Route::get('/login', function () {
 })->name('login');
 
 Route::get('/register', function () {
-    return redirect('/login'); 
+    return view('auth.register');
 })->name('register');
 
 Route::post('/logout', function () {

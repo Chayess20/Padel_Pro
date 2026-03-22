@@ -81,7 +81,7 @@ async function updateNav() {
             setCsrfToken(user.csrf_token);
             navSignUp.forEach((link) => {
                 link.textContent = user.role === 'admin' ? 'Dashboard' : 'Profile';
-                link.href = user.role === 'admin' ? 'admin.html' : 'profile.html';
+                link.href = user.role === 'admin' ? '/admin' : '/profile';
                 link.classList.add('btn-nav');
             });
             navLogin.forEach((link) => {
@@ -90,7 +90,7 @@ async function updateNav() {
                 link.addEventListener('click', async (e) => {
                     e.preventDefault();
                     await apiFetch('logout', { method: 'POST' });
-                    window.location.href = 'index.html';
+                    window.location.href = '/';
                 });
             });
         }
@@ -129,7 +129,7 @@ if (signupForm) {
         const res = await apiFetch('register', { method: 'POST', body: JSON.stringify(payload) });
         if (res.success) {
             setCsrfToken(res.data?.csrf_token);
-            window.location.href = 'profile.html';
+            window.location.href = '/profile';
         } else {
             msgEl.textContent = res.message || 'Registration failed.';
             msgEl.style.color = '#e74c3c';
@@ -163,7 +163,7 @@ if (loginForm) {
         const res = await apiFetch('login', { method: 'POST', body: JSON.stringify(payload) });
         if (res.success) {
             setCsrfToken(res.data?.csrf_token);
-            window.location.href = res.data?.role === 'admin' ? 'admin.html' : 'profile.html';
+            window.location.href = res.data?.role === 'admin' ? '/admin' : '/profile';
         } else {
             msgEl.textContent = res.message || 'Login failed.';
             msgEl.style.color = '#e74c3c';
@@ -180,18 +180,18 @@ if (document.querySelector('.profile-grid')) {
         // First check session — redirect admin to their dashboard
         const sessionRes = await apiFetch('session');
         if (!sessionRes.success || !sessionRes.data) {
-            window.location.href = 'log_in.html';
+            window.location.href = '/login';
             return;
         }
         setCsrfToken(sessionRes.data.csrf_token);
         if (sessionRes.data.role === 'admin') {
-            window.location.href = 'admin.html';
+            window.location.href = '/admin';
             return;
         }
 
         const res = await apiFetch('profile');
         if (!res.success) {
-            window.location.href = 'log_in.html';
+            window.location.href = '/login';
             return;
         }
         const d = res.data;
@@ -602,7 +602,7 @@ if (document.querySelector('.admin-page')) {
         // Verify admin session
         const sessionRes = await apiFetch('session');
         if (!sessionRes.success || !sessionRes.data || sessionRes.data.role !== 'admin') {
-            window.location.href = 'log_in.html';
+            window.location.href = '/login';
             return;
         }
         setCsrfToken(sessionRes.data.csrf_token);
@@ -851,7 +851,7 @@ if (document.querySelector('.admin-page')) {
             logoutLink.addEventListener('click', async (e) => {
                 e.preventDefault();
                 await apiFetch('logout', { method: 'POST' });
-                window.location.href = 'index.html';
+                window.location.href = '/';
             });
         }
 
@@ -939,7 +939,7 @@ if (resetForm) {
         }
         if (res.success) {
             resetForm.reset();
-            setTimeout(() => { window.location.href = 'log_in.html'; }, 2000);
+            setTimeout(() => { window.location.href = '/login'; }, 2000);
         }
     });
 }
