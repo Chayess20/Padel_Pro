@@ -3,7 +3,6 @@
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RankingController;
 use App\Http\Controllers\TournamentController;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // 1. Home
@@ -59,8 +58,5 @@ Route::middleware('auth')->group(function () {
 
 // 8. Admin page (requires admin role)
 Route::get('/admin', function () {
-    if (! Auth::check() || Auth::user()->role !== 'admin') {
-        return redirect('/login');
-    }
     return view('admin.admin');
-})->name('admin.dashboard');
+})->middleware(['auth', 'admin'])->name('admin.dashboard');

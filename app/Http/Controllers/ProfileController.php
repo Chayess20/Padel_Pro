@@ -50,12 +50,15 @@ class ProfileController extends Controller
                 ];
             })->values()->toArray();
 
-        // Simple division progression map
-        $divisions    = ['Beginner', 'Intermediate', 'Advanced', 'Elite'];
-        $thresholds   = [0, 100, 300, 600];
+        // Division progression — must match User::divisionForPoints() thresholds
+        $divisions    = ['Beginner', 'Intermediate', 'Advanced', 'Professional'];
+        $thresholds   = [0, 300, 1000, 3000];
         $currentIndex = array_search($user->division, $divisions);
         $currentIndex = $currentIndex === false ? 0 : $currentIndex;
-        $nextIndex    = min($currentIndex + 1, count($divisions) - 1);
+
+        $isMaxDivision = $currentIndex === count($divisions) - 1;
+        $nextDivision  = $isMaxDivision ? $divisions[$currentIndex] : $divisions[$currentIndex + 1];
+        $nextPoints    = $isMaxDivision ? null : $thresholds[$currentIndex + 1];
 
         return response()->json([
             'success' => true,
@@ -66,8 +69,8 @@ class ProfileController extends Controller
                 'division'            => $user->division,
                 'points'              => $user->points,
                 'tournament_count'    => $registrations->count(),
-                'next_division'       => $divisions[$nextIndex],
-                'next_points'         => $thresholds[$nextIndex] ?? null,
+                'next_division'       => $nextDivision,
+                'next_points'         => $nextPoints,
                 'recent_tournaments'  => $recentTournaments,
                 'upcoming_tournaments'=> $upcomingTournaments,
             ],

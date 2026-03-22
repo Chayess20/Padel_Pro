@@ -17,7 +17,7 @@ class AdminController extends Controller
     {
         $totalPlayers  = User::where('role', 'player')->count();
         $activeEvents  = Tournament::whereIn('status', ['open', 'live'])->count();
-        $pendingScores = 0;
+        $pendingScores = Tournament::where('status', 'live')->count();
         $monthlyCount  = Tournament::where('type', 'monthly')->count();
         $weeklyCount   = Tournament::where('type', 'weekly')->count();
 
@@ -65,7 +65,9 @@ class AdminController extends Controller
             });
         }
 
-        $players = $query->get()->map(fn ($p) => [
+        $paginator = $query->paginate(20);
+
+        $players = $paginator->getCollection()->map(fn ($p) => [
             'id'        => $p->id,
             'full_name' => $p->name,
             'email'     => $p->email,
@@ -73,7 +75,16 @@ class AdminController extends Controller
             'points'    => $p->points,
         ]);
 
-        return response()->json(['success' => true, 'data' => $players]);
+        return response()->json([
+            'success' => true,
+            'data'    => $players,
+            'meta'    => [
+                'current_page' => $paginator->currentPage(),
+                'last_page'    => $paginator->lastPage(),
+                'per_page'     => $paginator->perPage(),
+                'total'        => $paginator->total(),
+            ],
+        ]);
     }
 
     /**
@@ -184,7 +195,7 @@ class AdminController extends Controller
             ? $user->points + $validated['points']
             : max(0, $user->points - $validated['points']);
 
-        $user->division = $this->calcDivision($user->points);
+        $user->division = User::divisionForPoints($user->points);
         $user->save();
 
         RankingAdjustment::create([
@@ -201,11 +212,5 @@ class AdminController extends Controller
         ]);
     }
 
-    private function calcDivision(int $points): string
-    {
-        if ($points >= 3000) return 'Professional';
-        if ($points >= 1000) return 'Advanced';
-        if ($points >= 300)  return 'Intermediate';
-        return 'Beginner';
-    }
 }
+

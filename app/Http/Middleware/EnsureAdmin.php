@@ -12,7 +12,11 @@ class EnsureAdmin
     public function handle(Request $request, Closure $next): Response
     {
         if (! Auth::check() || Auth::user()->role !== 'admin') {
-            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
+            }
+
+            return redirect()->route('login');
         }
 
         return $next($request);
