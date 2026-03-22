@@ -19,6 +19,6 @@ class RankingController extends Controller
         ->orderByDesc('points')
         ->get();
 
-    return view('rankings', compact('womenPlayers', 'menPlayers'));
+    return view('rankings.rankings', compact('womenPlayers', 'menPlayers'));
 }
 }
