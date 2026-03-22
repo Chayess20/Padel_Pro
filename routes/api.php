@@ -31,7 +31,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // Admin-only endpoints
-Route::middleware(['auth'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard',            [AdminController::class, 'dashboard']);
     Route::get('/players',              [AdminController::class, 'players']);
     Route::post('/tournaments',         [AdminController::class, 'createTournament']);
