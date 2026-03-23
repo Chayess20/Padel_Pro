@@ -63,9 +63,8 @@
                                 </span>
                             </div>
                             @auth
-                                <form method="POST" action="{{ route('tournaments.register') }}">
+                                <form method="POST" action="{{ route('tournaments.register', $tournament) }}">
                                     @csrf
-                                    <input type="hidden" name="tournament_id" value="{{ $tournament->id }}">
                                     <button type="submit" class="btn btn-primary btn-block reg-btn"
                                             data-req="{{ $tournament->required_points }}">
                                         Register Team
