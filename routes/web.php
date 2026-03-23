@@ -3,6 +3,7 @@
 use App\Http\Controllers\RankingController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\TournamentController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -27,6 +28,23 @@ Route::get('/rankings', [RankingController::class, 'index'])
 Route::get('/login', function () {
     return view('auth.login'); 
 })->name('login');
+
+Route::post('/login', function (Request $request) {
+    $credentials = $request->validate([
+        'email'    => ['required', 'email'],
+        'password' => ['required'],
+    ]);
+
+    if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        $request->session()->regenerate();
+        $request->session()->regenerateToken();
+        return redirect()->intended('/');
+    }
+
+    return back()->withErrors([
+        'email' => 'The provided credentials do not match our records.',
+    ])->onlyInput('email');
+})->middleware('guest');
 
 Route::get('/register', function () {
     return redirect('/login'); 
