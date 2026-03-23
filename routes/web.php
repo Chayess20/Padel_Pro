@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RankingController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\TournamentController;
@@ -23,19 +24,20 @@ Route::get('/weekly-tournaments', [TournamentController::class, 'weekly'])
 Route::get('/rankings', [RankingController::class, 'index'])
     ->name('rankings.index');
 
-// 5. Authentication (Fixes the Login/Register/Logout errors)
-Route::get('/login', function () {
-    return view('auth.login'); 
-})->name('login');
-
-Route::get('/register', function () {
-    return redirect('/login'); 
-})->name('register');
+// 5. Authentication
+Route::middleware('guest')->group(function () {
+    Route::get('/login',     [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login',    [AuthController::class, 'login']);
+    Route::get('/register',  [AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [AuthController::class, 'register']);
+});
 
 Route::post('/logout', function () {
     Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
     return redirect('/');
-})->name('logout');
+})->name('logout')->middleware('auth');
 
 // 6. Protected Player Routes
 Route::middleware('auth')->group(function () {
