@@ -77,9 +77,36 @@ Route::post('/contact', function (Request $request) {
 // 7. Protected Player Routes
 Route::middleware('auth')->group(function () {
     Route::post('/tournaments/{tournament}/register', [RegistrationController::class, 'store'])
-        ->name('tournaments.register'); 
-        
+        ->name('tournaments.register');
+
     Route::get('/profile', function () {
-        return view('user.profile');
+        /** @var \App\Models\User $user */
+        $user = auth()->user()->loadCount(['registrations as tournament_registrations_count']);
+
+        $upcomingTournaments = $user->registrations()
+            ->with('tournament')
+            ->whereHas('tournament', fn ($q) => $q->whereDate('event_date', '>=', now()))
+            ->get();
+
+        $divisions    = ['Beginner' => 0, 'Intermediate' => 300, 'Advanced' => 1000, 'Professional' => 3000];
+        $names        = array_keys($divisions);
+        $currentIndex = array_search($user->division, $names, true);
+        $nextDivision = ($currentIndex !== false && $currentIndex < count($names) - 1)
+            ? $names[$currentIndex + 1]
+            : null;
+        $nextPoints   = $nextDivision ? max(0, $divisions[$nextDivision] - $user->points) : null;
+
+        return view('profile', [
+            'user'                => $user,
+            'upcomingTournaments' => $upcomingTournaments,
+            'upcomingCourts'      => collect(),   // court-booking feature not yet implemented
+            'nextDivision'        => $nextDivision,
+            'nextPoints'          => $nextPoints,
+        ]);
     })->name('profile');
+
+    Route::post('/bookings/cancel', function () {
+        // Placeholder — court & tournament booking cancellation will be implemented later.
+        return back()->with('info', 'Cancellation is not yet available.');
+    })->name('bookings.cancel');
 });

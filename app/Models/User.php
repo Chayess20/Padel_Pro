@@ -43,6 +43,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->role === 'admin';
     }
 
+    public function getFullNameAttribute(): string
+    {
+        return $this->name;
+    }
+
     public function rankingAdjustments()
     {
         return $this->hasMany(RankingAdjustment::class);

@@ -23,6 +23,11 @@ class Tournament extends Model
     'entry_fee',   
     'max_players'  
 ];
+
+    protected $casts = [
+        'event_date' => 'date',
+    ];
+
     public function registrations(): HasMany
 {
     return $this->hasMany(TournamentRegistration::class);
