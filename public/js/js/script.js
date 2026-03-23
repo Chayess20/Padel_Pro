@@ -36,14 +36,6 @@ async function apiFetch(endpoint, options = {}) {
     return { ok: res.ok, status: res.status, ...json };
 }
 
-function showMessage(container, message, isError = false) {
-    let el = document.querySelector(container);
-    if (!el) return;
-    el.textContent = message;
-    el.style.color = isError ? '#e74c3c' : '#2ecc71';
-    el.style.display = 'block';
-}
-
 function openModal(id) {
     const m = document.getElementById(id);
     if (m) m.classList.add('active');
@@ -52,6 +44,12 @@ function openModal(id) {
 function closeModal(id) {
     const m = document.getElementById(id);
     if (m) m.classList.remove('active');
+}
+
+function escHtml(str) {
+    const d = document.createElement('div');
+    d.appendChild(document.createTextNode(str));
+    return d.innerHTML;
 }
 
 // Close modals on backdrop click
@@ -360,12 +358,6 @@ if (document.querySelector('.profile-grid')) {
             });
         });
     }
-}
-
-function escHtml(str) {
-    const d = document.createElement('div');
-    d.appendChild(document.createTextNode(str));
-    return d.innerHTML;
 }
 
 // -----------------------------------------------
