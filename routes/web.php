@@ -56,7 +56,25 @@ Route::post('/logout', function (Request $request) {
     return redirect('/');
 })->name('logout');
 
-// 6. Protected Player Routes
+// 6. Legal Pages
+Route::view('/terms',   'legal.terms')->name('legal.terms');
+Route::view('/privacy', 'legal.privacy')->name('legal.privacy');
+Route::get('/contact',  function () {
+    return view('legal.contact');
+})->name('legal.contact');
+
+Route::post('/contact', function (Request $request) {
+    $request->validate([
+        'name'    => ['required', 'string', 'max:255'],
+        'email'   => ['required', 'email', 'max:255'],
+        'message' => ['required', 'string', 'max:5000'],
+    ]);
+
+    // TODO: send email via Mail facade once a mailer is configured
+    return back()->with('success', 'Thank you! Your message has been received.');
+})->name('legal.contact.submit');
+
+// 7. Protected Player Routes
 Route::middleware('auth')->group(function () {
     Route::post('/tournaments/{tournament}/register', [RegistrationController::class, 'store'])
         ->name('tournaments.register'); 

@@ -69,9 +69,9 @@
             <div class="footer-col">
                 <h4 class="col-title">Support</h4>
                 <ul class="footer-links">
-                    <li><a href="#">Terms of Service</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="{{ route('legal.terms') }}">Terms of Service</a></li>
+                    <li><a href="{{ route('legal.privacy') }}">Privacy Policy</a></li>
+                    <li><a href="{{ route('legal.contact') }}">Contact Us</a></li>
                 </ul>
             </div>
 
