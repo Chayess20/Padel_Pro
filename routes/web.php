@@ -37,7 +37,6 @@ Route::post('/login', function (Request $request) {
 
     if (Auth::attempt($credentials, $request->boolean('remember'))) {
         $request->session()->regenerate();
-        $request->session()->regenerateToken();
         return redirect()->intended('/');
     }
 
@@ -50,8 +49,10 @@ Route::get('/register', function () {
     return redirect('/login'); 
 })->name('register');
 
-Route::post('/logout', function () {
+Route::post('/logout', function (Request $request) {
     Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
     return redirect('/');
 })->name('logout');
 
